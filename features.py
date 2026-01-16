@@ -14,21 +14,18 @@ def build_features(df):
     # Rolling volatility
     df["rolling_vol"] = df["log_return"].rolling(20).std()
 
-    # Trend regime
+    # Regimes
     df["trend_regime"] = np.where(df["ema_slope"] > 0, "UPTREND", "DOWNTREND")
-
-    # Vol regime
     vol_median = df["rolling_vol"].median()
     df["vol_regime"] = np.where(df["rolling_vol"] > vol_median, "HIGH_VOL", "LOW_VOL")
-
-    # Market regime
     df["market_regime"] = df["trend_regime"] + "_" + df["vol_regime"]
 
-    # One-hot encode
+    # One-hot encode regimes
     df = pd.get_dummies(
         df,
         columns=["trend_regime", "vol_regime", "market_regime"],
         drop_first=False
     )
 
-    return df
+    # ⚠️ DO NOT select features here
+    return df.dropna()
