@@ -43,6 +43,9 @@ if "date" in df.columns:
 # ------------------
 df = build_features(df)
 
+X = df.reindex(columns=final_features, fill_value=0)
+preds = model.predict(X)
+
 # ------------------
 # Target (only for display/backtest, not needed for prediction)
 # ------------------
