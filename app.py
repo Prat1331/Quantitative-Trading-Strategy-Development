@@ -39,28 +39,12 @@ if "date" in df.columns:
     df = df.sort_values("date")
 
 # ------------------
-# Feature engineering (SAME AS TRAINING)
+# Feature engineering (IDENTICAL to training)
 # ------------------
 df = build_features(df)
 
+# Align features EXACTLY as during training
 X = df.reindex(columns=final_features, fill_value=0)
-preds = model.predict(X)
-
-# ------------------
-# Target (only for display/backtest, not needed for prediction)
-# ------------------
-df["target"] = (df["log_return"].shift(-1) > 0).astype(int)
-
-df = df.dropna().copy()
-
-# ------------------
-# Align features EXACTLY
-# ------------------
-for col in final_features:
-    if col not in df.columns:
-        df[col] = 0
-
-X = df[final_features]
 
 # ------------------
 # Model selection
@@ -100,5 +84,4 @@ ax.plot(df["close"], label="Close Price")
 
 ax.set_title("Price Chart")
 ax.legend()
-
 st.pyplot(fig)
