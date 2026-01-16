@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 # ------------------
 # Load models
 # ------------------
-log_model = joblib.load("logistic_model.pkl")
-xgb_model = joblib.load("xgb_model.pkl")
+log_model = joblib.load("D:\Quantitative Trading Strategy Development\models\logistic_model.pkl")
+xgb_model = joblib.load("D:\Quantitative Trading Strategy Development\models\xgb_model.pkl")
 
 st.set_page_config(page_title="Intraday Regime ML Predictor", layout="wide")
 
