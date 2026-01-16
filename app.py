@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 # ------------------
 # Load models
 # ------------------
-log_model = joblib.load("D:\Quantitative Trading Strategy Development\models\logistic_model.pkl")
-xgb_model = joblib.load("D:\Quantitative Trading Strategy Development\models\xgb_model.pkl")
+log_model = joblib.load("models/logistic_model.pkl")
+xgb_model = joblib.load("models/xgb_model.pkl")
 
 st.set_page_config(page_title="Intraday Regime ML Predictor", layout="wide")
 
@@ -23,7 +23,8 @@ if uploaded_file:
     df = pd.read_csv(uploaded_file)
 else:
     st.info("Using default dataset")
-    df = pd.read_csv("spot_cleaned.csv")
+    df = pd.read_csv("data/spot_cleaned.csv")
+
 
 # ------------------
 # Preprocessing
