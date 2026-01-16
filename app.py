@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 # ------------------
 log_model = joblib.load("models/logistic_model.pkl")
 xgb_model = joblib.load("models/xgb_model.pkl")
+final_features = joblib.load("models/final_features.pkl")
 
 st.set_page_config(page_title="Intraday Regime ML Predictor", layout="wide")
 
