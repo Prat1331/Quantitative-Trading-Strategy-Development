@@ -1,130 +1,122 @@
-Quantitative Trading Strategy Development
-Regime-Aware Intraday Market Prediction
+📈 Quantitative Trading Strategy Development
+Regime-Aware Intraday Market Prediction using Machine Learning
+📌 Project Overview
 
-1. Project Objective
+This project focuses on building a regime-aware intraday trading prediction system using classical machine learning models and financial feature engineering.
+The system predicts the next-bar market direction (UP / DOWN) based on price action, volatility, and detected market regimes.
 
-The objective of this project is to build a regime-aware machine learning system that predicts the next-bar price direction (UP/DOWN) for intraday financial data using technical indicators and market regime classification.
+The project includes:
 
-This project demonstrates:
+Feature engineering using technical indicators
+Market regime detection (trend × volatility)
+Supervised ML models (Logistic Regression & XGBoost)
+A Streamlit web application for interactive prediction
+Model persistence and reproducibility
 
-Financial feature engineering
+🎯 Problem Statement
 
-Market regime detection
+Financial markets behave differently under different conditions (e.g., trending vs ranging, high vs low volatility).
+A single predictive model without regime awareness often performs poorly.
 
-Supervised ML model training
+Goal:
 
-Model deployment using Streamlit
+Build a regime-aware ML pipeline that adapts predictions based on current market conditions.
 
-2. What Has Been Implemented ✅
-Data & Features
-
-Cleaned OHLCV market data
+🧠 Key Concepts Used
 
 Log returns
-
-Exponential Moving Average (EMA)
-
-EMA slope (trend strength)
-
+Exponential Moving Averages (EMA)
 Rolling volatility
+Trend & volatility regime classification
+One-hot encoding of regimes
+Time-series aware train/test split
+Probabilistic classification
+Model deployment with Streamlit
 
-Trend regime (UPTREND / DOWNTREND)
-
-Volatility regime (HIGH / LOW)
-
-Market regime (trend × volatility)
-
-One-hot encoded regime features
-
-Machine Learning Models
-
-Logistic Regression
-
-XGBoost Classifier
-
-Time-based train/test split
-
-Feature consistency using saved feature list
-
-Model persistence using joblib
-
-Streamlit Application
-
-Upload OHLCV CSV file
-
-Automatic feature generation
-
-Model selection (Logistic / XGBoost)
-
-Latest prediction with confidence score
-
-Price chart visualization
-
-3. Project Structure
+🏗️ Project Structure
 Quantitative-Trading-Strategy-Development/
 │
-├── app.py              # Streamlit application
-├── train.py            # Model training pipeline
-├── features.py         # Feature engineering logic
-├── README.md           # Project documentation
-├── requirements.txt    # Dependencies
+├── app.py                  # Streamlit application
+├── train.py                # Model training pipeline
+├── features.py             # Feature engineering logic
+├── config.py               # (Optional) config/constants
+├── README.md               # Project documentation
+├── requirements.txt        # Python dependencies
 │
 ├── data/
-│   └── spot_cleaned.csv
+│   └── spot_cleaned.csv    # Cleaned OHLCV dataset
 │
 ├── models/
-│   ├── logistic_model.pkl
-│   ├── xgb_model.pkl
-│   └── final_features.pkl
+│   ├── logistic_model.pkl  # Trained Logistic Regression model
+│   ├── xgb_model.pkl       # Trained XGBoost model
+│   └── final_features.pkl  # Exact feature list used in training
 
-4. How to Run the Project
-Train Models
-python train.py
+⚙️ Feature Engineering
 
-Run Streamlit App
+All feature engineering is centralized in features.py to ensure training and inference consistency.
+
+Engineered Features
+log_return – Logarithmic price returns
+ema – Exponential Moving Average
+ema_slope – Trend strength
+rolling_vol – Rolling volatility
+trend_regime – UPTREND / DOWNTREND
+vol_regime – HIGH_VOL / LOW_VOL
+market_regime – Combined regime (one-hot encoded)
+
+🧪 Target Variable
+
+Binary classification
+
+target = 1 → next bar return > 0 (UP)
+target = 0 → next bar return ≤ 0 (DOWN)
+
+
+The prediction horizon is next-bar direction, suitable for intraday strategies.
+
+🤖 Models Used
+1. Logistic Regression
+
+Baseline interpretable model
+Fast and stable
+Useful for regime impact analysis
+
+2. XGBoost Classifier
+
+Non-linear model
+Captures complex feature interactions
+Generally higher predictive performance
+
+Both models are:
+
+Trained using time-based splits
+Saved using joblib
+Loaded dynamically in the Streamlit app
+
+🖥️ Streamlit Application
+
+The Streamlit app (app.py) provides:
+CSV upload for OHLCV data
+Automatic feature generation
+Model selection (Logistic / XGBoost)
+Latest market prediction with confidence
+Interactive price chart visualization
+
+Run the app locally
 streamlit run app.py
 
-5. What Is NOT Implemented Yet 🚧
+🧩 Tech Stack
 
-The following were not part of the current scope but can be added later:
-
-LSTM / Deep learning models
-
-Walk-forward or rolling retraining
-
-Transaction costs & slippage
-
-Portfolio construction & position sizing
-
-Live market data integration
-
-Automated trade execution
-
-Risk management (stop-loss / take-profit)
-
-Hyperparameter optimization
-
-Full backtesting engine
-
-6. Technologies Used
-
-Python
-
+Python 3.10+
 Pandas, NumPy
-
 Scikit-learn
-
 XGBoost
-
 Streamlit
-
 Matplotlib
-
 Joblib
 
 Git & GitHub
 
-7. Disclaimer
-
-This project is for educational and research purposes only.
-It does not constitute financial advice and should not be used for live trading without proper validation and risk management.
+👤 Author
+Prat
+Quantitative Trading & Machine Learning
