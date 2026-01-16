@@ -4,14 +4,19 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 
+from features import build_features
+
 # ------------------
-# Load models
+# Load models & metadata
 # ------------------
 log_model = joblib.load("models/logistic_model.pkl")
 xgb_model = joblib.load("models/xgb_model.pkl")
 final_features = joblib.load("models/final_features.pkl")
 
-st.set_page_config(page_title="Intraday Regime ML Predictor", layout="wide")
+st.set_page_config(
+    page_title="Intraday Regime ML Predictor",
+    layout="wide"
+)
 
 st.title("📈 Regime-Aware Intraday Prediction App")
 
@@ -26,52 +31,51 @@ else:
     st.info("Using default dataset")
     df = pd.read_csv("data/spot_cleaned.csv")
 
+# ------------------
+# Date handling
+# ------------------
+if "date" in df.columns:
+    df["date"] = pd.to_datetime(df["date"])
+    df = df.sort_values("date")
 
 # ------------------
-# Preprocessing
+# Feature engineering (SAME AS TRAINING)
 # ------------------
-df['log_return'] = np.log(df['close'] / df['close'].shift(1))
+df = build_features(df)
 
-# EMA
-df['ema_fast'] = df['close'].ewm(span=12).mean()
-df['ema_slow'] = df['close'].ewm(span=26).mean()
-df['ema_slope'] = df['ema_fast'] - df['ema_slow']
-
-# Volatility
-VOL_WINDOW = 20
-df['rolling_vol'] = df['log_return'].rolling(VOL_WINDOW).std()
-
-vol_median = df['rolling_vol'].median()
-df['vol_regime'] = np.where(df['rolling_vol'] > vol_median, 'HIGH_VOL', 'LOW_VOL')
-df['trend_regime'] = np.where(df['ema_slope'] > 0, 'UPTREND', 'DOWNTREND')
-df['market_regime'] = df['trend_regime'] + "_" + df['vol_regime']
+# ------------------
+# Target (only for display/backtest, not needed for prediction)
+# ------------------
+df["target"] = (df["log_return"].shift(-1) > 0).astype(int)
 
 df = df.dropna().copy()
 
 # ------------------
-# Feature matrix
+# Align features EXACTLY
 # ------------------
-features = [
-    'log_return',
-    'ema_fast',
-    'ema_slow',
-    'ema_slope',
-    'rolling_vol'
-]
+for col in final_features:
+    if col not in df.columns:
+        df[col] = 0
 
-X = df[features]
+X = df[final_features]
 
 # ------------------
-# Prediction
+# Model selection
 # ------------------
-model_choice = st.selectbox("Choose Model", ["Logistic Regression", "XGBoost"])
+model_choice = st.selectbox(
+    "Choose Model",
+    ["Logistic Regression", "XGBoost"]
+)
 
 if model_choice == "Logistic Regression":
     preds = log_model.predict(X)
+    probs = log_model.predict_proba(X)[:, 1]
 else:
     preds = xgb_model.predict(X)
+    probs = xgb_model.predict_proba(X)[:, 1]
 
-df['prediction'] = preds
+df["prediction"] = preds
+df["confidence"] = probs
 
 # ------------------
 # Latest prediction
@@ -79,17 +83,19 @@ df['prediction'] = preds
 latest = df.iloc[-1]
 
 st.subheader("📌 Latest Prediction")
-st.write("Market Regime:", latest['market_regime'])
-st.write("Prediction (1=UP, 0=DOWN):", int(latest['prediction']))
+st.write("Market Regime:", latest.get("market_regime", "N/A"))
+st.write("Prediction:", "⬆️ UP" if latest["prediction"] == 1 else "⬇️ DOWN")
+st.write("Confidence:", f"{latest['confidence']:.2%}")
 
 # ------------------
-# Plot
+# Plot price
 # ------------------
-st.subheader("📊 Price Chart with Regime")
+st.subheader("📊 Price Chart")
 
-fig, ax = plt.subplots(figsize=(12,4))
-ax.plot(df['close'], label='Close')
+fig, ax = plt.subplots(figsize=(12, 4))
+ax.plot(df["close"], label="Close Price")
 
 ax.set_title("Price Chart")
 ax.legend()
+
 st.pyplot(fig)
